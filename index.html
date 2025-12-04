@@ -157,12 +157,23 @@
         </nav>
       </section>
     </main>
-<a href="https://wa.me/96825584055" 
-   target="_blank" 
-   rel="noopener noreferrer"
-   style="color:#0a7aff; font-size:22px; font-weight:bold;">
-   25584055
-</a>
+Swal.fire({
+  title: "تنبيه مهم",
+  html: `
+    <p style="font-size:18px; line-height:1.7;">
+     مشاركتك دليل وعيك واهتمامك... ولأن صحتك تستحق الأفضل تواصل مع عيادة التثقيف الصحي:<br>
+      <a href="https://wa.me/96825584055"
+         target="_blank"
+         rel="noopener noreferrer"
+         style="color:#0a7aff; font-size:22px; font-weight:bold;">
+         25584055
+      </a>
+    </p>
+  `,
+  icon: "warning",
+  confirmButtonText: "متابعة"
+});
+
 
     <footer class="site-footer">
       <div class="container">
