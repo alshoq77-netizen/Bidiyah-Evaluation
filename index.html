@@ -5,109 +5,132 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>مستشفى بدية – تقييم خطر الإصابة بالسكري</title>
 
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
 
-  <div id="app" class="rtl">
+  <div class="container">
 
-    <!-- الهيدر -->
-    <header class="site-header">
-      <div class="container header-inner">
-        <div class="brand">
-          <div class="brand-row">
-            <svg class="steth" width="28" height="28" viewBox="0 0 24 24">
-              <path fill="white" d="M6 3v2a4 4 0 004 4h0a4 4 0 004-4V3h2v2a6 6 0 01-6 6h0a6 6 0 01-6-6V3h2zM14 15a2 2 0 012 2v4a2 2 0 11-4 0v-4a2 2 0 012-2z"/>
-            </svg>
-            <h1>مستشفى بدية</h1>
-          </div>
-          <p class="tagline">
-            احسب خطر إصابتك بمرض السكري بخطوات بسيطة.
-          </p>
+    <!-- المقدمة -->
+    <section id="intro" class="card">
+      <h2>مرحبًا بك في أداة التقييم</h2>
+      <p>
+        هذه الأداة تقدّم تقييمًا توعويًا لخطر الإصابة بمرض السكري من النوع الثاني.
+      </p>
+      <button id="startBtn" class="btn primary">ابدأ الآن ⏩</button>
+    </section>
+
+    <!-- الاستبيان -->
+    <section id="survey" class="card" hidden>
+
+      <!-- Step 1 -->
+      <div class="step" data-step="1">
+        <h3>المعلومات الأساسية</h3>
+
+        <label>الرقم المدني
+          <input id="civilNumber" type="text" maxlength="20">
+        </label>
+
+        <label>العمر
+          <input id="age" type="number" min="1" max="120">
+        </label>
+
+        <label>الجنس
+          <select id="gender">
+            <option value="female">أنثى</option>
+            <option value="male">ذكر</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" data-step="2" hidden>
+        <h3>هل لديك قريب مصاب بالسكري؟</h3>
+        <div class="options">
+          <button class="btn option" data-value="yes">نعم</button>
+          <button class="btn option" data-value="no">لا</button>
+          <button class="btn option" data-value="dontknow">لا أعرف</button>
         </div>
       </div>
-    </header>
 
-    <!-- المحتوى -->
-    <main class="container">
-
-      <!-- المقدمة -->
-      <section id="intro" class="card hero-wave">
-        <h2>مرحبًا بك في أداة التقييم</h2>
-        <p class="lead">هذه الأداة تقدّم تقييمًا توعويًا لخطر الإصابة بمرض السكري.</p>
-        <div class="actions">
-          <button id="startBtn" class="btn primary">ابدأ الآن ⏩</button>
+      <!-- Step 3 -->
+      <div class="step" data-step="3" hidden>
+        <h3>هل تم تشخيصك بارتفاع ضغط الدم؟</h3>
+        <div class="options">
+          <button class="btn option" data-value="yes">نعم</button>
+          <button class="btn option" data-value="no">لا</button>
         </div>
-      </section>
-
-      <!-- الاستبيان -->
-      <section id="survey" class="card" hidden>
-
-        <!-- خطوة 1 -->
-        <div class="step" data-step="1">
-          <h3>المعلومات الأساسية</h3>
-
-          <label>الرقم المدني
-            <input id="civilNumber" type="text" maxlength="20">
-          </label>
-
-          <label>العمر
-            <input id="age" type="number" min="1" max="120">
-          </label>
-
-          <label>الجنس
-            <select id="gender">
-              <option value="female">أنثى</option>
-              <option value="male">ذكر</option>
-            </select>
-          </label>
-        </div>
-
-        <!-- خطوة 2 -->
-        <div class="step" data-step="2" hidden>
-          <h3>هل لديك قريب مصاب بالسكري؟</h3>
-          <div class="options">
-            <button class="btn option" data-value="yes">نعم</button>
-            <button class="btn option" data-value="no">لا</button>
-            <button class="btn option" data-value="dontknow">لا أعرف</button>
-          </div>
-        </div>
-
-        <!-- (باقي الخطوات كما هي) -->
-
-        <!-- خطوة النتيجة -->
-        <div class="step" data-step="8" hidden>
-          <h3>نتيجتك الصحية</h3>
-          <div id="finalResult" class="result-box"></div>
-
-          <div class="actions">
-            <button id="submitBtn" class="btn primary">📤 إرسال البيانات</button>
-            <button id="restartBtn" class="btn">🔄 إعادة التقييم</button>
-          </div>
-        </div>
-
-        <!-- أزرار التنقل -->
-        <nav class="nav-footer">
-          <button id="prevBtn" class="btn ghost" hidden>السابق</button>
-          <button id="nextBtn" class="btn primary" hidden>التالي</button>
-        </nav>
-      </section>
-
-    </main>
-
-    <!-- الفوتر -->
-    <footer class="site-footer">
-      <div class="container">
-        <p>© مستشفى بدية 2025 – Bidiya Hospital</p>
       </div>
-    </footer>
 
+      <!-- Step 4 BMI -->
+      <div class="step" data-step="4" hidden>
+        <h3>قياس كتلة الجسم (BMI)</h3>
+
+        <label>الطول (سم)
+          <input id="height" type="number" min="30" max="300">
+        </label>
+
+        <label>الوزن (كجم)
+          <input id="weight" type="number" min="10" max="500">
+        </label>
+
+        <p>مؤشر كتلة الجسم: <strong id="bmiValue">-</strong></p>
+        <p>التصنيف: <strong id="bmiCategory">-</strong></p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step" data-step="5" hidden>
+        <h3>هل تتناول الخضار والفواكه يوميًا تقريبًا؟</h3>
+        <div class="options">
+          <button class="btn option" data-value="daily">يوميًا</button>
+          <button class="btn option" data-value="sometimes">أحيانًا</button>
+          <button class="btn option" data-value="rarely">نادرًا</button>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step" data-step="6" hidden>
+        <h3>محيط الخصر</h3>
+        <label>
+          <input id="waist" type="number" placeholder="أدخل محيط الخصر بالسم">
+        </label>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="step" data-step="7" hidden>
+        <h3>النشاط البدني الأسبوعي</h3>
+        <div class="options">
+          <button class="btn option" data-value="0">0 أيام</button>
+          <button class="btn option" data-value="1-2">1–2 أيام</button>
+          <button class="btn option" data-value="3+">3 أيام أو أكثر</button>
+        </div>
+      </div>
+
+      <!-- Step 8 -->
+      <div class="step" data-step="8" hidden>
+        <h3>نتيجتك الصحية</h3>
+        <div id="finalResult" class="result-box"></div>
+
+        <button id="submitBtn" class="btn primary">📤 إرسال البيانات</button>
+        <button id="restartBtn" class="btn">🔄 إعادة التقييم</button>
+      </div>
+
+      <!-- تنقل -->
+      <div>
+        <button id="prevBtn" class="btn ghost" hidden>السابق</button>
+        <button id="nextBtn" class="btn primary" hidden>التالي</button>
+      </div>
+
+    </section>
   </div>
 
-  <!-- تشغيل السكربت -->
+  <footer class="site-footer">
+    <p>© مستشفى بدية 2025</p>
+  </footer>
+
   <script src="script.js"></script>
 
 </body>
