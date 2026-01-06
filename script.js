@@ -12,7 +12,7 @@ const submitBtn = document.getElementById("submitBtn");
 const restartBtn = document.getElementById("restartBtn");
 const finalResult = document.getElementById("finalResult");
 
-// رابط Google Apps Script / SheetDB الخاص بك
+// رابط Google SheetDB
 const GOOGLE_SCRIPT_URL = "https://sheetdb.io/api/v1/1ut4e13p8dyk6";
 
 // حفظ البيانات
@@ -26,24 +26,20 @@ startBtn.addEventListener("click", () => {
   showStep(1);
 });
 
-// عرض خطوة معينة
+// عرض خطوة
 function showStep(step) {
   steps.forEach(s => s.hidden = true);
-  document.querySelector(`.step[data-step="${step}"]`).hidden = false;
+  const el = document.querySelector(`.step[data-step="${step}"]`);
+  if (el) el.hidden = false;
 
   prevBtn.hidden = step === 1;
-  nextBtn.hidden = (step === steps.length);
-
-  if (step === steps.length) {
-    nextBtn.hidden = true;
-  }
+  nextBtn.hidden = step === steps.length;
 }
 
-// الانتقال بين الخطوات
+// تنقل
 nextBtn.addEventListener("click", () => {
   saveCurrentStepData();
   currentStep++;
-  if (currentStep > steps.length) currentStep = steps.length;
   showStep(currentStep);
 });
 
@@ -53,29 +49,30 @@ prevBtn.addEventListener("click", () => {
   showStep(currentStep);
 });
 
-// حفظ إجابات الأزرار (نعم / لا / ... إلخ)
+// أزرار الاختيار
 document.querySelectorAll(".btn.option").forEach(btn => {
-  btn.addEventListener("click", (e) => {
-    const parent = e.target.closest(".step");
-    const stepNum = parseInt(parent.dataset.step);
-    const value = e.target.dataset.value;
-    userData[`step${stepNum}`] = value;
+  btn.addEventListener("click", e => {
+    const step = e.target.closest(".step");
+    const stepNum = step.dataset.step;
+    userData[`step${stepNum}`] = e.target.dataset.value;
     currentStep++;
     showStep(currentStep);
   });
 });
 
-// حفظ بيانات الخطوة الحالية (المدخلات)
+// حفظ المدخلات
 function saveCurrentStepData() {
   const step = document.querySelector(`.step[data-step="${currentStep}"]`);
   if (!step) return;
 
   step.querySelectorAll("input, select").forEach(el => {
-    userData[el.id] = el.value;
+    if (el.id) userData[el.id] = el.value;
   });
 }
 
-// حساب BMI تلقائيًا
+// =========================
+// BMI
+// =========================
 const heightInput = document.getElementById("height");
 const weightInput = document.getElementById("weight");
 const bmiValue = document.getElementById("bmiValue");
@@ -84,6 +81,7 @@ const bmiCategory = document.getElementById("bmiCategory");
 function calculateBMI() {
   const h = parseFloat(heightInput.value);
   const w = parseFloat(weightInput.value);
+
   if (h && w) {
     const bmi = (w / ((h / 100) ** 2)).toFixed(1);
     bmiValue.textContent = bmi;
@@ -95,110 +93,78 @@ function calculateBMI() {
     else category = "سمنة";
 
     bmiCategory.textContent = category;
-    userData["BMI"] = bmi;
-    userData["BMI_Category"] = category;
+    userData.BMI = bmi;
+    userData.BMI_Category = category;
   }
 }
+
 heightInput?.addEventListener("input", calculateBMI);
 weightInput?.addEventListener("input", calculateBMI);
 
-// عرض النتيجة النهائية (قبل الإرسال)
-
+// =========================
+// عرض النتيجة (كما كتبتها أنت)
+// =========================
 function showFinalResult() {
 
   let score = 0;
 
   if (userData.step2 === "yes") score += 2;
-
   if (userData.step3 === "yes") score += 2;
-
   if (userData.BMI && parseFloat(userData.BMI) > 30) score += 3;
-
   if (userData.step5 === "rarely") score += 2;
-
   if (userData.step7 === "0") score += 2;
 
   let level = "منخفض";
-
   if (score >= 3 && score < 6) level = "متوسط";
-
   if (score >= 6) level = "مرتفع";
 
   finalResult.innerHTML = `
-
     <p><strong>مستوى الخطورة:</strong> ${level}</p>
-
     <p>النقاط: ${score}</p>
-
   `;
 
-  userData["Risk_Score"] = score;
+  userData.Risk_Score = score;
+  userData.Risk_Level = level;
 
-  userData["Risk_Level"] = level;
-
-  // ⭐⭐⭐ إضافة تنبيه للمراجعين (متوسط فما فوق) ⭐⭐⭐
-
+  // ⭐ نفس التنبيه الذي كتبته – بدون تغيير
   if (level === "متوسط" || level === "مرتفع") {
-
     setTimeout(() => {
-
       Swal.fire({
-
         title: "تنبيه مهم",
-
         html: `
-
           <p style="font-size:18px; line-height:1.7;">
-
             مشاركتك دليل وعيك واهتمامك... ولأن صحتك تستحق الأفضل تواصل مع عيادة التثقيف الصحي:<br>
-
-            <a href="https://wa.me/96825584055" 
-
-               target="_blank" 
-
+            <a href="https://wa.me/96825584055"
+               target="_blank"
                style="color:#0a7aff; font-size:22px; font-weight:bold;">
-
               25584055
-
             </a>
-
           </p>
-
         `,
-
         icon: "warning",
-
         confirmButtonText: "متابعة"
-
       });
-
     }, 300);
-
   }
-
-  // ⭐⭐⭐ نهاية الإضافة ⭐⭐⭐
-
 }
-// إرسال البيانات إلى SheetDB
+
+// =========================
+// إرسال البيانات
+// =========================
 submitBtn.addEventListener("click", async () => {
   saveCurrentStepData();
-  // حفظ الرقم المدني إذا كان خارج أي خطوة
-  userData["civilNumber"] = document.getElementById("civilNumber").value;
+  userData.civilNumber = document.getElementById("civilNumber").value;
 
-  showFinalResult();
+  showFinalResult(); // ⭐ هنا الفرق المهم
 
   try {
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
+    await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sheet1: userData }) // وضع البيانات داخل كائن باسم الشيت
+      body: JSON.stringify({ sheet1: userData })
     });
-    const result = await response.json();
-    console.log(result);
-    alert("✅ تم إرسال البيانات بنجاح إلى مستند Google Sheets");
   } catch (err) {
     console.error(err);
-    alert("⚠️ حدث خطأ أثناء الإرسال، تحقق من الرابط أو الاتصال بالإنترنت");
   }
 });
 
