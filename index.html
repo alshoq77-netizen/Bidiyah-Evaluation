@@ -5,89 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>مستشفى بدية – تقييم خطر الإصابة بالسكري</title>
 
-  <!-- CSS -->
-  <style>
-    body {
-      font-family: "Tajawal", sans-serif;
-      background: linear-gradient(to bottom right, #e3f2fd, #bbdefb);
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      direction: rtl;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 25px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-
-    .btn {
-      background: #0077cc;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 18px;
-      margin: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .btn:hover { background: #005fa3; }
-
-    .btn.ghost {
-      background: #e0e0e0;
-      color: #333;
-    }
-
-    .btn.primary {
-      background: #0077cc;
-      color: white;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 12px;
-      text-align: right;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 6px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    .options {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .result-box {
-      background: #f1f8e9;
-      border: 1px solid #c5e1a5;
-      padding: 20px;
-      border-radius: 8px;
-    }
-
-    .site-footer {
-      padding: 15px;
-      font-size: 14px;
-      color: #555;
-    }
-  </style>
-
+  <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -107,8 +25,105 @@
 
     <!-- الاستبيان -->
     <section id="survey" class="card" hidden>
-      <!-- الخطوات كما أرسلتها أنت (من 1 إلى 8) -->
-      <!-- ... نفس الكود السابق للخطوات ... -->
+
+      <!-- Step 1 -->
+      <div class="step" data-step="1">
+        <h3>المعلومات الأساسية</h3>
+
+        <label>الرقم المدني
+          <input id="civilNumber" type="text" maxlength="20">
+        </label>
+
+        <label>العمر
+          <input id="age" type="number" min="1" max="120">
+        </label>
+
+        <label>الجنس
+          <select id="gender">
+            <option value="female">أنثى</option>
+            <option value="male">ذكر</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" data-step="2" hidden>
+        <h3>هل لديك قريب مصاب بالسكري؟</h3>
+        <div class="options">
+          <button class="btn option" data-value="yes">نعم</button>
+          <button class="btn option" data-value="no">لا</button>
+          <button class="btn option" data-value="dontknow">لا أعرف</button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step" data-step="3" hidden>
+        <h3>هل تم تشخيصك بارتفاع ضغط الدم؟</h3>
+        <div class="options">
+          <button class="btn option" data-value="yes">نعم</button>
+          <button class="btn option" data-value="no">لا</button>
+        </div>
+      </div>
+
+      <!-- Step 4 BMI -->
+      <div class="step" data-step="4" hidden>
+        <h3>قياس كتلة الجسم (BMI)</h3>
+
+        <label>الطول (سم)
+          <input id="height" type="number" min="30" max="300">
+        </label>
+
+        <label>الوزن (كجم)
+          <input id="weight" type="number" min="10" max="500">
+        </label>
+
+        <p>مؤشر كتلة الجسم: <strong id="bmiValue">-</strong></p>
+        <p>التصنيف: <strong id="bmiCategory">-</strong></p>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step" data-step="5" hidden>
+        <h3>هل تتناول الخضار والفواكه يوميًا تقريبًا؟</h3>
+        <div class="options">
+          <button class="btn option" data-value="daily">يوميًا</button>
+          <button class="btn option" data-value="sometimes">أحيانًا</button>
+          <button class="btn option" data-value="rarely">نادرًا</button>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step" data-step="6" hidden>
+        <h3>محيط الخصر</h3>
+        <label>
+          <input id="waist" type="number" placeholder="أدخل محيط الخصر بالسم">
+        </label>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="step" data-step="7" hidden>
+        <h3>النشاط البدني الأسبوعي</h3>
+        <div class="options">
+          <button class="btn option" data-value="0">0 أيام</button>
+          <button class="btn option" data-value="1-2">1–2 أيام</button>
+          <button class="btn option" data-value="3+">3 أيام أو أكثر</button>
+        </div>
+      </div>
+
+      <!-- Step 8 -->
+      <div class="step" data-step="8" hidden>
+        <h3>نتيجتك الصحية</h3>
+        <div id="finalResult" class="result-box"></div>
+
+        <button id="submitBtn" class="btn primary">📤 إرسال البيانات</button>
+        <button id="restartBtn" class="btn">🔄 إعادة التقييم</button>
+      </div>
+
+      <!-- تنقل -->
+      <div>
+        <button id="prevBtn" class="btn ghost" hidden>السابق</button>
+        <button id="nextBtn" class="btn primary" hidden>التالي</button>
+      </div>
+
     </section>
   </div>
 
@@ -116,207 +131,7 @@
     <p>© مستشفى بدية 2025</p>
   </footer>
 
-  <!-- JavaScript -->
-  <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const startBtn = document.getElementById("startBtn");
-    const survey = document.getElementById("survey");
-    const steps = document.querySelectorAll(".step");
-    const nextBtn = document.getElementById("nextBtn");
-    const prevBtn = document.getElementById("prevBtn");
-    const submitBtn = document.getElementById("submitBtn");
-    const restartBtn = document.getElementById("restartBtn");
-    const finalResult = document.getElementById("finalResult");
+  <script src="script.js"></script>
 
-    const GOOGLE_SCRIPT_URL = "https://sheetdb.io/api/v1/1ut4e13p8dyk6";
-
-    let userData = {};
-    let currentStep = 1;
-
-    startBtn.addEventListener("click", () => {
-      document.getElementById("intro").hidden = true;
-      survey.hidden = false;
-      showStep(1);
-    });
-
-    function showStep(step) {
-  // إخفاء جميع الخطوات
-  steps.forEach(s => s.hidden = true);
-
-  // إظهار الخطوة المطلوبة
-  const el = document.querySelector(`.step[data-step="${step}"]`);
-  if (el) el.hidden = false;
-
-  // التحكم في ظهور أزرار السابق/التالي
-  prevBtn.hidden = step === 1;
-  nextBtn.hidden = step === steps.length;
-}
-
-    nextBtn.addEventListener("click", () => {
-      saveCurrentStepData();
-      currentStep++;
-      showStep(currentStep);
-    });
-
-    prevBtn.addEventListener("click", () => {
-      currentStep--;
-      if (currentStep < 1) currentStep = 1;
-      showStep(currentStep);
-    });
-    // أزرار الاختيار
-    document.addEventListener("DOMContentLoaded", () => {
-  // أزرار الاختيار
-  document.querySelectorAll(".btn.option").forEach(btn => {
-    btn.addEventListener("click", e => {
-      const step = e.target.closest(".step");
-      const stepNum = step.dataset.step;
-      userData[`step${stepNum}`] = e.target.dataset.value;
-      currentStep++;
-      showStep(currentStep);
-    });
-  });
-});// حفظ المدخلات
-function saveCurrentStepData() {
-  const step = document.querySelector(`.step[data-step="${currentStep}"]`);
-  if (!step) return;
-
-  step.querySelectorAll("input, select").forEach(el => {
-    if (el.id) {
-      userData[el.id] = el.value;
-    }
-  });
-}
-
-    // BMI
-    const heightInput = document.getElementById("height");
-    const weightInput = document.getElementById("weight");
-    const bmiValue = document.getElementById("bmiValue");
-    const bmiCategory = document.getElementById("bmiCategory");
-
-    function calculateBMI() {
-      const h = parseFloat(heightInput.value);
-      const w = parseFloat(weightInput.value);
-
-      if (h && w) {
-        const bmi = (w / ((h / 100) ** 2)).toFixed(1);
-        bmiValue.textContent = bmi;
-
-        let category = "";
-        if (bmi < 18.5) category = "نحافة";
-        else if (bmi < 25) category = "طبيعي";
-        else if (bmi < 30) category = "زيادة وزن";
-        else category = "سمنة";
-
-        bmiCategory.textContent = category;
-        userData.BMI = bmi;
-        userData.BMI_Category = category;
-      }
-    }
-
-    heightInput?.addEventListener("input", calculateBMI);
-    weightInput?.addEventListener("input", calculateBMI);
-
-    // عرض النتيجة
-    function showFinalResult() {
-  let score = 0;
-
-  if (userData.step2 === "yes") score += 2;
-  if (userData.step3 === "yes") score += 2;
-  if (userData.BMI && parseFloat(userData.BMI) > 30) score += 3;
-  if (userData.step5 === "rarely") score += 2;
-  if (userData.step7 === "0") score += 2;
-
-  let level = "منخفض";
-  if (score >= 3 && score < 6) level = "متوسط";
-  if (score >= 6) level = "مرتفع";
-
-  // تأكد من وجود العنصر
-  if (!finalResult) {
-    console.warn("finalResult عنصر غير موجود في DOM");
-    return;
-  }
-
-  finalResult.innerHTML = `
-    <p><strong>مستوى الخطورة:</strong> ${level}</p>
-    <p>النقاط: ${score}</p>
-  `;
-
-  userData.Risk_Score = score;
-  userData.Risk_Level = level;
-
-  // إظهار التنبيه فقط إذا كانت المكتبة محملة
-  if ((level === "متوسط" || level === "مرتفع") && typeof Swal !== "undefined") {
-    setTimeout(() => {
-      Swal.fire({
-        title: "تنبيه مهم",
-        html: `
-          <p style="font-size:18px; line-height:1.7;">
-            مشاركتك دليل وعيك واهتمامك... ولأن صحتك تستحق الأفضل تواصل مع عيادة التثقيف الصحي:<br>
-            <a href="https://wa.me/96825584055"
-               target="_blank"
-               style="color:#0a7aff; font-size:22px; font-weight:bold;">
-              25584055
-            </a>
-          </p>
-        `,
-        icon: "warning",
-        confirmButtonText: "متابعة"
-      });
-    }, 300);
-  }
-}
-// إرسال البيانات
-submitBtn.addEventListener("click", async () => {
-  saveCurrentStepData();
-  userData.civilNumber = document.getElementById("civilNumber").value;
-
-  showFinalResult();
-
-  try {
-    await fetch(GOOGLE_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sheet1: userData })
-    });
-  } catch (err) {
-    console.error(err);
-  }
-});
-      }
-    });
-
-    // إعادة التقييم
-    restartBtn.addEventListener("click", () => {
-      userData = {};
-      currentStep = 1;
-      showStep(1);
-    });
-  }); // نهاية DOMContentLoaded
-  
-document.addEventListener("DOMContentLoaded", () => {
-  const startBtn = document.getElementById("startBtn");
-  const survey = document.getElementById("survey");
-  const steps = document.querySelectorAll(".step");
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-
-  let currentStep = 1;
-
-  function showStep(step) {
-    steps.forEach(s => s.hidden = true);
-    const el = document.querySelector(`.step[data-step="${step}"]`);
-    if (el) el.hidden = false;
-
-    prevBtn.hidden = step === 1;
-    nextBtn.hidden = step === steps.length;
-  }
-
-  startBtn.addEventListener("click", () => {
-    document.getElementById("intro").hidden = true;
-    survey.hidden = false;
-    showStep(1);
-  });
-});
-  </script>
 </body>
 </html>
