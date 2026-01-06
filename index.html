@@ -293,5 +293,31 @@ submitBtn.addEventListener("click", async () => {
     });
   }); // نهاية DOMContentLoaded
   </script>
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const startBtn = document.getElementById("startBtn");
+  const survey = document.getElementById("survey");
+  const steps = document.querySelectorAll(".step");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  let currentStep = 1;
+
+  function showStep(step) {
+    steps.forEach(s => s.hidden = true);
+    const el = document.querySelector(`.step[data-step="${step}"]`);
+    if (el) el.hidden = false;
+
+    prevBtn.hidden = step === 1;
+    nextBtn.hidden = step === steps.length;
+  }
+
+  startBtn.addEventListener("click", () => {
+    document.getElementById("intro").hidden = true;
+    survey.hidden = false;
+    showStep(1);
+  });
+});
+  </script>
 </body>
 </html>
