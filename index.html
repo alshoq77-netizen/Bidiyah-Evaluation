@@ -107,105 +107,8 @@
 
     <!-- الاستبيان -->
     <section id="survey" class="card" hidden>
-
-      <!-- Step 1 -->
-      <div class="step" data-step="1">
-        <h3>المعلومات الأساسية</h3>
-
-        <label>الرقم المدني
-          <input id="civilNumber" type="text" maxlength="20">
-        </label>
-
-        <label>العمر
-          <input id="age" type="number" min="1" max="120">
-        </label>
-
-        <label>الجنس
-          <select id="gender">
-            <option value="female">أنثى</option>
-            <option value="male">ذكر</option>
-          </select>
-        </label>
-      </div>
-
-      <!-- Step 2 -->
-      <div class="step" data-step="2" hidden>
-        <h3>هل لديك قريب مصاب بالسكري؟</h3>
-        <div class="options">
-          <button class="btn option" data-value="yes">نعم</button>
-          <button class="btn option" data-value="no">لا</button>
-          <button class="btn option" data-value="dontknow">لا أعرف</button>
-        </div>
-      </div>
-
-      <!-- Step 3 -->
-      <div class="step" data-step="3" hidden>
-        <h3>هل تم تشخيصك بارتفاع ضغط الدم؟</h3>
-        <div class="options">
-          <button class="btn option" data-value="yes">نعم</button>
-          <button class="btn option" data-value="no">لا</button>
-        </div>
-      </div>
-
-      <!-- Step 4 BMI -->
-      <div class="step" data-step="4" hidden>
-        <h3>قياس كتلة الجسم (BMI)</h3>
-
-        <label>الطول (سم)
-          <input id="height" type="number" min="30" max="300">
-        </label>
-
-        <label>الوزن (كجم)
-          <input id="weight" type="number" min="10" max="500">
-        </label>
-
-        <p>مؤشر كتلة الجسم: <strong id="bmiValue">-</strong></p>
-        <p>التصنيف: <strong id="bmiCategory">-</strong></p>
-      </div>
-
-      <!-- Step 5 -->
-      <div class="step" data-step="5" hidden>
-        <h3>هل تتناول الخضار والفواكه يوميًا تقريبًا؟</h3>
-        <div class="options">
-          <button class="btn option" data-value="daily">يوميًا</button>
-          <button class="btn option" data-value="sometimes">أحيانًا</button>
-          <button class="btn option" data-value="rarely">نادرًا</button>
-        </div>
-      </div>
-
-      <!-- Step 6 -->
-      <div class="step" data-step="6" hidden>
-        <h3>محيط الخصر</h3>
-        <label>
-          <input id="waist" type="number" placeholder="أدخل محيط الخصر بالسم">
-        </label>
-      </div>
-
-      <!-- Step 7 -->
-      <div class="step" data-step="7" hidden>
-        <h3>النشاط البدني الأسبوعي</h3>
-        <div class="options">
-          <button class="btn option" data-value="0">0 أيام</button>
-          <button class="btn option" data-value="1-2">1–2 أيام</button>
-          <button class="btn option" data-value="3+">3 أيام أو أكثر</button>
-        </div>
-      </div>
-
-      <!-- Step 8 -->
-      <div class="step" data-step="8" hidden>
-        <h3>نتيجتك الصحية</h3>
-        <div id="finalResult" class="result-box"></div>
-
-        <button id="submitBtn" class="btn primary">📤 إرسال البيانات</button>
-        <button id="restartBtn" class="btn">🔄 إعادة التقييم</button>
-      </div>
-
-      <!-- تنقل -->
-      <div>
-        <button id="prevBtn" class="btn ghost" hidden>السابق</button>
-        <button id="nextBtn" class="btn primary" hidden>التالي</button>
-      </div>
-
+      <!-- الخطوات كما أرسلتها أنت (من 1 إلى 8) -->
+      <!-- ... نفس الكود السابق للخطوات ... -->
     </section>
   </div>
 
@@ -215,10 +118,7 @@
 
   <!-- JavaScript -->
   <script>
-    // =========================
-    //  استبيان السكري - مستشفى بدية
-    // =========================
-
+  document.addEventListener("DOMContentLoaded", () => {
     const startBtn = document.getElementById("startBtn");
     const survey = document.getElementById("survey");
     const steps = document.querySelectorAll(".step");
@@ -256,18 +156,14 @@
 
     prevBtn.addEventListener("click", () => {
       currentStep--;
-      ifprevBtn.addEventListener("click", () => {
-      currentStep--;
       if (currentStep < 1) currentStep = 1;
       showStep(currentStep);
-    });
-
-    // أزرار الاختيار
+    });// أزرار الاختيار
     document.querySelectorAll(".btn.option").forEach(btn => {
       btn.addEventListener("click", e => {
         const step = e.target.closest(".step");
         const stepNum = step.dataset.step;
-        userData[`step${stepNum}`] = e.target.dataset.value;
+        userData[\`step\${stepNum}\`] = e.target.dataset.value;
         currentStep++;
         showStep(currentStep);
       });
@@ -275,7 +171,7 @@
 
     // حفظ المدخلات
     function saveCurrentStepData() {
-      const step = document.querySelector(`.step[data-step="${currentStep}"]`);
+      const step = document.querySelector(\`.step[data-step="\${currentStep}"]\`);
       if (!step) return;
 
       step.querySelectorAll("input, select").forEach(el => {
@@ -283,9 +179,7 @@
       });
     }
 
-    // =========================
     // BMI
-    // =========================
     const heightInput = document.getElementById("height");
     const weightInput = document.getElementById("weight");
     const bmiValue = document.getElementById("bmiValue");
@@ -314,9 +208,7 @@
     heightInput?.addEventListener("input", calculateBMI);
     weightInput?.addEventListener("input", calculateBMI);
 
-    // =========================
     // عرض النتيجة
-    // =========================
     function showFinalResult() {
       let score = 0;
 
@@ -330,10 +222,10 @@
       if (score >= 3 && score < 6) level = "متوسط";
       if (score >= 6) level = "مرتفع";
 
-      finalResult.innerHTML = `
-        <p><strong>مستوى الخطورة:</strong> ${level}</p>
-        <p>النقاط: ${score}</p>
-      `;
+      finalResult.innerHTML = \`
+        <p><strong>مستوى الخطورة:</strong> \${level}</p>
+        <p>النقاط: \${score}</p>
+      \`;
 
       userData.Risk_Score = score;
       userData.Risk_Level = level;
@@ -342,7 +234,7 @@
         setTimeout(() => {
           Swal.fire({
             title: "تنبيه مهم",
-            html: `
+            html: \`
               <p style="font-size:18px; line-height:1.7;">
                 مشاركتك دليل وعيك واهتمامك... ولأن صحتك تستحق الأفضل تواصل مع عيادة التثقيف الصحي:<br>
                 <a href="https://wa.me/96825584055"
@@ -351,7 +243,7 @@
                   25584055
                 </a>
               </p>
-            `,
+            \`,
             icon: "warning",
             confirmButtonText: "متابعة"
           });
@@ -359,9 +251,7 @@
       }
     }
 
-    // =========================
     // إرسال البيانات
-    // =========================
     submitBtn.addEventListener("click", async () => {
       saveCurrentStepData();
       userData.civilNumber = document.getElementById("civilNumber").value;
@@ -369,6 +259,8 @@
       showFinalResult();
 
       try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          methodtry {
         await fetch(GOOGLE_SCRIPT_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -385,6 +277,7 @@
       currentStep = 1;
       showStep(1);
     });
+  }); // نهاية DOMContentLoaded
   </script>
 </body>
 </html>
