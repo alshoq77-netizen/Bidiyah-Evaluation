@@ -140,13 +140,17 @@
     });
 
     function showStep(step) {
-      steps.forEach(s => s.hidden = true);
-      const el = document.querySelector(\`.step[data-step="\${step}"]\`);
-      if (el) el.hidden = false;
+  // إخفاء جميع الخطوات
+  steps.forEach(s => s.hidden = true);
 
-      prevBtn.hidden = step === 1;
-      nextBtn.hidden = step === steps.length;
-    }
+  // إظهار الخطوة المطلوبة
+  const el = document.querySelector(`.step[data-step="${step}"]`);
+  if (el) el.hidden = false;
+
+  // التحكم في ظهور أزرار السابق/التالي
+  prevBtn.hidden = step === 1;
+  nextBtn.hidden = step === steps.length;
+}
 
     nextBtn.addEventListener("click", () => {
       saveCurrentStepData();
@@ -158,26 +162,30 @@
       currentStep--;
       if (currentStep < 1) currentStep = 1;
       showStep(currentStep);
-    });// أزرار الاختيار
-    document.querySelectorAll(".btn.option").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const step = e.target.closest(".step");
-        const stepNum = step.dataset.step;
-        userData[\`step\${stepNum}\`] = e.target.dataset.value;
-        currentStep++;
-        showStep(currentStep);
-      });
     });
+    // أزرار الاختيار
+    document.addEventListener("DOMContentLoaded", () => {
+  // أزرار الاختيار
+  document.querySelectorAll(".btn.option").forEach(btn => {
+    btn.addEventListener("click", e => {
+      const step = e.target.closest(".step");
+      const stepNum = step.dataset.step;
+      userData[`step${stepNum}`] = e.target.dataset.value;
+      currentStep++;
+      showStep(currentStep);
+    });
+  });
+});// حفظ المدخلات
+function saveCurrentStepData() {
+  const step = document.querySelector(`.step[data-step="${currentStep}"]`);
+  if (!step) return;
 
-    // حفظ المدخلات
-    function saveCurrentStepData() {
-      const step = document.querySelector(\`.step[data-step="\${currentStep}"]\`);
-      if (!step) return;
-
-      step.querySelectorAll("input, select").forEach(el => {
-        if (el.id) userData[el.id] = el.value;
-      });
+  step.querySelectorAll("input, select").forEach(el => {
+    if (el.id) {
+      userData[el.id] = el.value;
     }
+  });
+}
 
     // BMI
     const heightInput = document.getElementById("height");
@@ -210,64 +218,70 @@
 
     // عرض النتيجة
     function showFinalResult() {
-      let score = 0;
+  let score = 0;
 
-      if (userData.step2 === "yes") score += 2;
-      if (userData.step3 === "yes") score += 2;
-      if (userData.BMI && parseFloat(userData.BMI) > 30) score += 3;
-      if (userData.step5 === "rarely") score += 2;
-      if (userData.step7 === "0") score += 2;
+  if (userData.step2 === "yes") score += 2;
+  if (userData.step3 === "yes") score += 2;
+  if (userData.BMI && parseFloat(userData.BMI) > 30) score += 3;
+  if (userData.step5 === "rarely") score += 2;
+  if (userData.step7 === "0") score += 2;
 
-      let level = "منخفض";
-      if (score >= 3 && score < 6) level = "متوسط";
-      if (score >= 6) level = "مرتفع";
+  let level = "منخفض";
+  if (score >= 3 && score < 6) level = "متوسط";
+  if (score >= 6) level = "مرتفع";
 
-      finalResult.innerHTML = \`
-        <p><strong>مستوى الخطورة:</strong> \${level}</p>
-        <p>النقاط: \${score}</p>
-      \`;
+  // تأكد من وجود العنصر
+  if (!finalResult) {
+    console.warn("finalResult عنصر غير موجود في DOM");
+    return;
+  }
 
-      userData.Risk_Score = score;
-      userData.Risk_Level = level;
+  finalResult.innerHTML = `
+    <p><strong>مستوى الخطورة:</strong> ${level}</p>
+    <p>النقاط: ${score}</p>
+  `;
 
-      if (level === "متوسط" || level === "مرتفع") {
-        setTimeout(() => {
-          Swal.fire({
-            title: "تنبيه مهم",
-            html: \`
-              <p style="font-size:18px; line-height:1.7;">
-                مشاركتك دليل وعيك واهتمامك... ولأن صحتك تستحق الأفضل تواصل مع عيادة التثقيف الصحي:<br>
-                <a href="https://wa.me/96825584055"
-                   target="_blank"
-                   style="color:#0a7aff; font-size:22px; font-weight:bold;">
-                  25584055
-                </a>
-              </p>
-            \`,
-            icon: "warning",
-            confirmButtonText: "متابعة"
-          });
-        }, 300);
-      }
-    }
+  userData.Risk_Score = score;
+  userData.Risk_Level = level;
 
-    // إرسال البيانات
-    submitBtn.addEventListener("click", async () => {
-      saveCurrentStepData();
-      userData.civilNumber = document.getElementById("civilNumber").value;
+  // إظهار التنبيه فقط إذا كانت المكتبة محملة
+  if ((level === "متوسط" || level === "مرتفع") && typeof Swal !== "undefined") {
+    setTimeout(() => {
+      Swal.fire({
+        title: "تنبيه مهم",
+        html: `
+          <p style="font-size:18px; line-height:1.7;">
+            مشاركتك دليل وعيك واهتمامك... ولأن صحتك تستحق الأفضل تواصل مع عيادة التثقيف الصحي:<br>
+            <a href="https://wa.me/96825584055"
+               target="_blank"
+               style="color:#0a7aff; font-size:22px; font-weight:bold;">
+              25584055
+            </a>
+          </p>
+        `,
+        icon: "warning",
+        confirmButtonText: "متابعة"
+      });
+    }, 300);
+  }
+}
+// إرسال البيانات
+submitBtn.addEventListener("click", async () => {
+  saveCurrentStepData();
+  userData.civilNumber = document.getElementById("civilNumber").value;
 
-      showFinalResult();
+  showFinalResult();
 
-      try {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          methodtry {
-        await fetch(GOOGLE_SCRIPT_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sheet1: userData })
-        });
-      } catch (err) {
-        console.error(err);
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sheet1: userData })
+    });
+  } catch (err) {
+    console.error(err);
+  }
+});
       }
     });
 
