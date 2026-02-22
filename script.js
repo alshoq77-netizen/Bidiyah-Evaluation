@@ -12,8 +12,8 @@ const submitBtn = document.getElementById("submitBtn");
 const restartBtn = document.getElementById("restartBtn");
 const finalResult = document.getElementById("finalResult");
 
-// رابط Google SheetDB
-const GOOGLE_SCRIPT_URL = "https://sheetdb.io/api/v1/1ut4e13p8dyk6";
+// ✅ رابط Google Apps Script Web App (رابطك)
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKvNwCstOrITjxISnPWIFSaZmNnb2giROtmv7ESr5Y1cXsOCvmmC2z7OG1cRNJqIKGwQ/exec";
 
 // حفظ البيانات
 let userData = {};
@@ -34,6 +34,9 @@ function showStep(step) {
 
   prevBtn.hidden = step === 1;
   nextBtn.hidden = step === steps.length;
+
+  // ⭐ عندما يصل لخطوة النتيجة نعرض النتيجة
+  if (step === 8) showFinalResult();
 }
 
 // تنقل
@@ -102,10 +105,9 @@ heightInput?.addEventListener("input", calculateBMI);
 weightInput?.addEventListener("input", calculateBMI);
 
 // =========================
-// عرض النتيجة (كما كتبتها أنت)
+// عرض النتيجة
 // =========================
 function showFinalResult() {
-
   let score = 0;
 
   if (userData.step2 === "yes") score += 2;
@@ -126,7 +128,6 @@ function showFinalResult() {
   userData.Risk_Score = score;
   userData.Risk_Level = level;
 
-  // ⭐ نفس التنبيه الذي كتبته – بدون تغيير
   if (level === "متوسط" || level === "مرتفع") {
     setTimeout(() => {
       Swal.fire({
@@ -153,18 +154,59 @@ function showFinalResult() {
 // =========================
 submitBtn.addEventListener("click", async () => {
   saveCurrentStepData();
-  userData.civilNumber = document.getElementById("civilNumber").value;
 
-  showFinalResult(); // ⭐ هنا الفرق المهم
+  // تثبيت القيم الأساسية (مهم)
+  userData.civilNumber = document.getElementById("civilNumber").value;
+  userData.phoneNumber = document.getElementById("phoneNumber").value;
+
+  // ✅ تحقق سريع قبل الإرسال
+  const cleanPhone = (userData.phoneNumber || "").toString().replace(/\s+/g, "").trim();
+  if (!cleanPhone) {
+    Swal.fire({ icon: "error", title: "لم يتم الحفظ", text: "رقم الهاتف مطلوب" });
+    return;
+  }
+  const omaniRegex = /^(?:968)?\d{8}$/;
+  if (!omaniRegex.test(cleanPhone)) {
+    Swal.fire({ icon: "error", title: "لم يتم الحفظ", text: "رقم الهاتف غير صحيح (8 أرقام أو يبدأ بـ 968)" });
+    return;
+  }
+
+  // عرض النتيجة (لو لم تكن ظهرت)
+  showFinalResult();
 
   try {
-    await fetch(GOOGLE_SCRIPT_URL, {
+    const res = await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
+      mode: "cors",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sheet1: userData })
+      body: JSON.stringify(userData) // ✅ JSON مباشر
     });
+
+    let result = {};
+    try { result = await res.json(); } catch (e) {}
+
+    if (!result || result.status !== "success") {
+      Swal.fire({
+        icon: "error",
+        title: "لم يتم الحفظ",
+        text: (result && result.message) ? result.message : "تعذر حفظ البيانات"
+      });
+      return;
+    }
+
+    Swal.fire({
+      icon: "success",
+      title: "تم الحفظ بنجاح",
+      text: result.message || "شكراً لمشاركتك"
+    });
+
   } catch (err) {
     console.error(err);
+    Swal.fire({
+      icon: "error",
+      title: "خطأ اتصال",
+      text: "تعذر الاتصال بالخادم"
+    });
   }
 });
 
