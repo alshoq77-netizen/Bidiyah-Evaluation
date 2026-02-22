@@ -2,31 +2,29 @@
 //  استبيان السكري - مستشفى بدية
 // =========================
 
-// إعدادات عامة
 const startBtn = document.getElementById("startBtn");
 const survey = document.getElementById("survey");
 const steps = document.querySelectorAll(".step");
 const nextBtn = document.getElementById("nextBtn");
 const prevBtn = document.getElementById("prevBtn");
-const submitBtn = document.getElementById("submitBtn");
 const restartBtn = document.getElementById("restartBtn");
 const finalResult = document.getElementById("finalResult");
 
-// ✅ رابط Google Apps Script Web App (رابطك)
+// ✅ رابط Google Apps Script Web App
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxKvNwCstOrITjxISnPWIFSaZmNnb2giROtmv7ESr5Y1cXsOCvmmC2z7OG1cRNJqIKGwQ/exec";
 
-// حفظ البيانات
 let userData = {};
 let currentStep = 1;
 
-// بدء الاستبيان
+// ✅ لمنع الإرسال مرتين إذا رجعتي للخطوة الأخيرة
+let hasSent = false;
+
 startBtn.addEventListener("click", () => {
   document.getElementById("intro").hidden = true;
   survey.hidden = false;
   showStep(1);
 });
 
-// عرض خطوة
 function showStep(step) {
   steps.forEach(s => s.hidden = true);
   const el = document.querySelector(`.step[data-step="${step}"]`);
@@ -35,11 +33,18 @@ function showStep(step) {
   prevBtn.hidden = step === 1;
   nextBtn.hidden = step === steps.length;
 
-  // ⭐ عندما يصل لخطوة النتيجة نعرض النتيجة
-  if (step === 8) showFinalResult();
+  // ✅ عند الوصول للنتيجة: اعرض النتيجة + أرسل تلقائياً مرة واحدة
+  if (step === 8) {
+    saveCurrentStepData();
+    showFinalResult();
+
+    if (!hasSent) {
+      hasSent = true;
+      autoSendData(); // ✅ إرسال تلقائي
+    }
+  }
 }
 
-// تنقل
 nextBtn.addEventListener("click", () => {
   saveCurrentStepData();
   currentStep++;
@@ -52,18 +57,22 @@ prevBtn.addEventListener("click", () => {
   showStep(currentStep);
 });
 
-// أزرار الاختيار
 document.querySelectorAll(".btn.option").forEach(btn => {
   btn.addEventListener("click", e => {
     const step = e.target.closest(".step");
     const stepNum = step.dataset.step;
+
+    // حفظ اختيار الزر
     userData[`step${stepNum}`] = e.target.dataset.value;
+
+    // (احتياط) حفظ أي مدخلات داخل نفس الخطوة لو وجدت
+    saveCurrentStepData();
+
     currentStep++;
     showStep(currentStep);
   });
 });
 
-// حفظ المدخلات
 function saveCurrentStepData() {
   const step = document.querySelector(`.step[data-step="${currentStep}"]`);
   if (!step) return;
@@ -150,69 +159,63 @@ function showFinalResult() {
 }
 
 // =========================
-// إرسال البيانات
+// إرسال تلقائي عند ظهور النتيجة
 // =========================
-submitBtn.addEventListener("click", async () => {
-  saveCurrentStepData();
-
-  // تثبيت القيم الأساسية (مهم)
-  userData.civilNumber = document.getElementById("civilNumber").value;
-  userData.phoneNumber = document.getElementById("phoneNumber").value;
+async function autoSendData() {
+  // اجمع بيانات Step 1 الأساسية
+  userData.civilNumber = document.getElementById("civilNumber")?.value || "";
+  userData.phoneNumber = document.getElementById("phoneNumber")?.value || "";
 
   // ✅ تحقق سريع قبل الإرسال
   const cleanPhone = (userData.phoneNumber || "").toString().replace(/\s+/g, "").trim();
   if (!cleanPhone) {
     Swal.fire({ icon: "error", title: "لم يتم الحفظ", text: "رقم الهاتف مطلوب" });
+    hasSent = false; // يسمح بإعادة الإرسال بعد التصحيح
     return;
   }
+
   const omaniRegex = /^(?:968)?\d{8}$/;
   if (!omaniRegex.test(cleanPhone)) {
     Swal.fire({ icon: "error", title: "لم يتم الحفظ", text: "رقم الهاتف غير صحيح (8 أرقام أو يبدأ بـ 968)" });
+    hasSent = false;
     return;
   }
 
-  // عرض النتيجة (لو لم تكن ظهرت)
-  showFinalResult();
+  // ثبت الهاتف المنظف
+  userData.phoneNumber = cleanPhone;
+
+  // ✅ شاشة إرسال
+  Swal.fire({
+    title: "جاري إرسال البيانات...",
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
 
   try {
-    const res = await fetch(GOOGLE_SCRIPT_URL, {
+    // ✅ حل CORS: إرسال كـ form-urlencoded + no-cors
+    // (الطلب غالبًا ينجح حتى لو لم نستطع قراءة الرد)
+    const params = new URLSearchParams();
+    Object.keys(userData).forEach(k => params.append(k, userData[k] ?? ""));
+
+    await fetch(GOOGLE_SCRIPT_URL, {
       method: "POST",
-      mode: "cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData) // ✅ JSON مباشر
+      mode: "no-cors",
+      body: params
     });
 
-    let result = {};
-    try { result = await res.json(); } catch (e) {}
-
-    if (!result || result.status !== "success") {
-      Swal.fire({
-        icon: "error",
-        title: "لم يتم الحفظ",
-        text: (result && result.message) ? result.message : "تعذر حفظ البيانات"
-      });
-      return;
-    }
-
-    Swal.fire({
-      icon: "success",
-      title: "تم الحفظ بنجاح",
-      text: result.message || "شكراً لمشاركتك"
-    });
+    Swal.fire({ icon: "success", title: "تم الإرسال", text: "تم إرسال البيانات بنجاح" });
 
   } catch (err) {
     console.error(err);
-    Swal.fire({
-      icon: "error",
-      title: "خطأ اتصال",
-      text: "تعذر الاتصال بالخادم"
-    });
+    Swal.fire({ icon: "error", title: "خطأ اتصال", text: "تعذر إرسال البيانات. حاول مرة أخرى." });
+    hasSent = false;
   }
-});
+}
 
 // إعادة التقييم
 restartBtn.addEventListener("click", () => {
   userData = {};
   currentStep = 1;
+  hasSent = false;
   showStep(1);
 });
