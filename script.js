@@ -34,7 +34,7 @@ function showStep(step) {
   nextBtn.hidden = step === steps.length;
 
   // ✅ عند الوصول للنتيجة: اعرض النتيجة + أرسل تلقائياً مرة واحدة
-  if (step === 8) {
+ if (step === steps.length){
     saveCurrentStepData();
     showFinalResult();
 
@@ -123,7 +123,7 @@ function showFinalResult() {
   if (userData.step3 === "yes") score += 2;
   if (userData.BMI && parseFloat(userData.BMI) > 30) score += 3;
   if (userData.step5 === "rarely") score += 2;
-  if (userData.step7 === "0") score += 2;
+  if (userData.step6 === "0") score += 2;
 
   let level = "منخفض";
   if (score >= 3 && score < 6) level = "متوسط";
